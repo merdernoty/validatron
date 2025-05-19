@@ -1,6 +1,6 @@
 # Validatron
 
-![Validatron (2)](https://github.com/user-attachments/assets/09e3d372-1fe7-4b3a-a4be-d99c729ccea3)
+![valodatron-rongo](https://github.com/user-attachments/assets/29bd7dbb-56b1-4981-96a9-062d38f4f4bf)
 
 **Validatron** — минималистичный и очень простой валидатор для Node.js без лишнего кода и зависимостей.
 
