@@ -1,4 +1,5 @@
 # Validatron
+![Uploading ChatGPT Image May 19 2025.png…]()
 
 **Validatron** — минималистичный и очень простой валидатор для Node.js без лишнего кода и зависимостей.
 
