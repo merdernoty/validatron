@@ -57,4 +57,4 @@ try {
 
 ## 📄 Лицензия
 
-MIT © merdernoty
+MIT © [merdernoty](https://github.com/merdernoty)
