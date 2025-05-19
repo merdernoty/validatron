@@ -1,6 +1,6 @@
 {
-  "name": "validatron",
-  "version": "0.0.1",
+  "name": "validatronjs",
+  "version": "0.0.2",
   "description": "simple validator for node.js",
   "main": "index.ts",
   "scripts": {
@@ -9,7 +9,7 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "validatron",
+    "validatronjs",
     "validation",
     "validator",
     "dto"

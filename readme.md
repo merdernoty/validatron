@@ -1,23 +1,23 @@
-# Validatron
+# Validatronjs
 
 ![valodatron-rongo](https://github.com/user-attachments/assets/29bd7dbb-56b1-4981-96a9-062d38f4f4bf)
 
-**Validatron** — минималистичный и очень простой валидатор для Node.js без лишнего кода и зависимостей.
+**Validatronjs** — минималистичный и очень простой валидатор для Node.js без лишнего кода и зависимостей.
 
 ## 🚀 Установка
 
 Установите пакет через npm или yarn:
 
 ```bash
-npm install validatron
+npm install validatronjs
 # или
-yarn add validatron
+yarn add validatronjs
 ```
 
 ## ⚡ Быстрый старт
 
 ```js
-import { IsString, IsNumber, validate, ValidationError } from 'validatron';
+import { IsString, IsNumber, validate, ValidationError } from 'validatronjs';
 
 class User {
   @IsString()
