@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { isNumber, isString, ValidatorFn } from "./validators";
+import { isArray, isBoolean, isDate, isEmail, isNumber, isObject, isPhoneNumber, isString, isUrl, isUUID, ValidatorFn, lengthValidator, minValidator, maxValidator, validateIfValidator, isIn, isNotEmpty, isNotNull, isUpperCase, isLowerCase } from "./validators";
 
 const VALIDATORS_KEY = Symbol("validators");
 
@@ -20,15 +20,44 @@ export function createPropertyDecorator(validator: ValidatorFn) {
   };
 }
 
-export const IsString = () => createPropertyDecorator(isString)
-export const IsNumber = () => createPropertyDecorator(isNumber)
+// Decorators
+export const IsString = () => createPropertyDecorator(isString);
+export const IsNumber = () => createPropertyDecorator(isNumber);
+export const IsBoolean = () => createPropertyDecorator(isBoolean);
+export const IsArray = () => createPropertyDecorator(isArray);
+export const IsObject = () => createPropertyDecorator(isObject);
+export const IsDate = () => createPropertyDecorator(isDate);
+export const IsEmail = () => createPropertyDecorator(isEmail);
+export const IsUrl = () => createPropertyDecorator(isUrl);
+export const IsUUID = () => createPropertyDecorator(isUUID);
+export const IsPhoneNumber = () => createPropertyDecorator(isPhoneNumber);
 
-export function validate(obj:any):void {
-    const prototype = Object.getPrototypeOf(obj);
-    const meta: ValidatorMeta[] = Reflect.getMetadata(VALIDATORS_KEY, prototype) || [];
-    for(const { property , validator} of meta) {
-        const value = obj[property]
-        validator(value, property)
-    }
 
+export const Length = (min: number, max: number) =>
+  createPropertyDecorator(lengthValidator(min, max));
+export const Min = (min: number) =>
+  createPropertyDecorator(minValidator(min));
+export const Max = (max: number) =>
+  createPropertyDecorator(maxValidator(max));
+export const ValidateIf = (cond: (v: unknown) => boolean) =>
+  createPropertyDecorator(validateIfValidator(cond));
+export const IsIn = (values: unknown[]) =>
+  createPropertyDecorator(isIn(values));
+
+export const IsNotEmpty = () =>
+  createPropertyDecorator(isNotEmpty());
+export const IsNotNull = () =>
+  createPropertyDecorator(isNotNull);
+export const IsUpperCase = () =>
+  createPropertyDecorator(isUpperCase());
+export const IsLowerCase = () =>
+  createPropertyDecorator(isLowerCase());
+
+export function validate(obj: any): void {
+  const prototype = Object.getPrototypeOf(obj);
+  const meta: ValidatorMeta[] = Reflect.getMetadata(VALIDATORS_KEY, prototype) || [];
+  for (const { property, validator } of meta) {
+    const value = obj[property];
+    validator(value, property);
+  }
 }
