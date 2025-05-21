@@ -1,6 +1,6 @@
 {
   "name": "validatronjs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "simple validator for node.js",
   "main": "index.ts",
   "scripts": {
