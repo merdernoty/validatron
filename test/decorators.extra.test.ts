@@ -283,5 +283,5 @@ describe("MinItems/@MaxItems декораторы", () => {
     expect(() => {
       dto.arr = [1, 2, 3, 4, 5];
       validate(dto);
-    }).toThrow(/arr: ожидается максимум 4 элементов/));
+    }).toThrow(/arr: ожидается не более 4 элементов/));
 });
