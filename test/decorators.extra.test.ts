@@ -1,28 +1,35 @@
-import 'reflect-metadata';
+import "reflect-metadata";
 import {
-  IsBoolean,
   IsArray,
-  IsObject,
+  IsBoolean,
   IsDate,
   IsEmail,
-  IsUrl,
-  IsUUID,
-  IsPhoneNumber,
-  Length,
-  Min,
-  Max,
-  ValidateIf,
+  IsEnum,
   IsIn,
+  IsInt,
+  IsLowerCase,
+  IsNegative,
   IsNotEmpty,
   IsNotNull,
-  IsUpperCase,
-  IsLowerCase,
-  validate,
-  ValidationError,
+  IsObject,
+  IsPhoneNumber,
+  IsPositive,
   IsString,
-} from '../src';
+  IsUpperCase,
+  IsUrl,
+  IsUUID,
+  Length,
+  Matches,
+  Max,
+  MaxItems,
+  Min,
+  MinItems,
+  validate,
+  ValidateIf,
+  ValidationError,
+} from "../src";
 
-describe('Дополнительные декораторы', () => {
+describe("Дополнительные декораторы", () => {
   class ExtraDto {
     @IsBoolean()
     flag!: boolean;
@@ -57,7 +64,7 @@ describe('Дополнительные декораторы', () => {
     @Max(20)
     maxVal!: number;
 
-    @IsIn(['a', 'b', 'c'])
+    @IsIn(["a", "b", "c"])
     oneOf!: string;
 
     @IsNotEmpty()
@@ -78,45 +85,45 @@ describe('Дополнительные декораторы', () => {
     dto = new ExtraDto();
   });
 
-  it('пропускает все корректные значения', () => {
+  it("пропускает все корректные значения", () => {
     Object.assign(dto, {
       flag: false,
       list: [1, 2],
       obj: { x: 1 },
       date: new Date(),
-      email: 'a@b.com',
-      url: 'https://example.com',
-      uuid: '123e4567-e89b-12d3-a456-426614174000',
-      phone: '+1234567890',
-      short: 'hey',
+      email: "a@b.com",
+      url: "https://example.com",
+      uuid: "123e4567-e89b-12d3-a456-426614174000",
+      phone: "+1234567890",
+      short: "hey",
       minVal: 10,
       maxVal: 20,
-      oneOf: 'b',
-      notEmpty: 'x',
+      oneOf: "b",
+      notEmpty: "x",
       notNull: 0,
-      upper: 'ABC',
-      lower: 'abc',
+      upper: "ABC",
+      lower: "abc",
     });
     expect(() => validate(dto)).not.toThrow();
   });
 
   const badCases: [keyof ExtraDto, any][] = [
-    ['flag', 'true'],
-    ['list', {}],
-    ['obj', null],
-    ['date', '2025-01-01'],
-    ['email', 'not@valid'],
-    ['url', 'notaurl'],
-    ['uuid', '1234'],
-    ['phone', 'abc'],
-    ['short', 'toolong'],
-    ['minVal', 5],
-    ['maxVal', 25],
-    ['oneOf', 'd'],
-    ['notEmpty', '   '],
-    ['notNull', null],
-    ['upper', 'AbC'],
-    ['lower', 'aBc'],
+    ["flag", "true"],
+    ["list", {}],
+    ["obj", null],
+    ["date", "2025-01-01"],
+    ["email", "not@valid"],
+    ["url", "notaurl"],
+    ["uuid", "1234"],
+    ["phone", "abc"],
+    ["short", "toolong"],
+    ["minVal", 5],
+    ["maxVal", 25],
+    ["oneOf", "d"],
+    ["notEmpty", "   "],
+    ["notNull", null],
+    ["upper", "AbC"],
+    ["lower", "aBc"],
   ];
 
   const defaultValid: Partial<ExtraDto> = {
@@ -124,18 +131,18 @@ describe('Дополнительные декораторы', () => {
     list: [1],
     obj: {},
     date: new Date(),
-    email: 'a@b.com',
-    url: 'https://x.com',
-    uuid: '123e4567-e89b-12d3-a456-426614174000',
-    phone: '+1234567890',
-    short: 'ok',
+    email: "a@b.com",
+    url: "https://x.com",
+    uuid: "123e4567-e89b-12d3-a456-426614174000",
+    phone: "+1234567890",
+    short: "ok",
     minVal: 10,
     maxVal: 20,
-    oneOf: 'a',
-    notEmpty: 'x',
+    oneOf: "a",
+    notEmpty: "x",
     notNull: 0,
-    upper: 'OK',
-    lower: 'ok',
+    upper: "OK",
+    lower: "ok",
   };
 
   for (const [prop, badValue] of badCases) {
@@ -149,9 +156,9 @@ describe('Дополнительные декораторы', () => {
   }
 });
 
-describe('ValidateIf декоратор в изоляции', () => {
+describe("ValidateIf декоратор в изоляции", () => {
   class CondDto {
-    @ValidateIf((v) => typeof v === 'string' && v.startsWith('ok'))
+    @ValidateIf((v) => typeof v === "string" && v.startsWith("ok"))
     @IsString()
     conditional!: string;
   }
@@ -161,21 +168,120 @@ describe('ValidateIf декоратор в изоляции', () => {
     dto = new CondDto();
   });
 
-  it('бросает ValidationError, если условие не выполнено', () => {
+  it("бросает ValidationError, если условие не выполнено", () => {
     // @ts-expect-error
     dto.conditional = 123;
     expect(() => validate(dto)).toThrow(ValidationError);
     expect(() => validate(dto)).toThrow(/^conditional: ожидается строка/);
   });
 
-  it('пропускает корректное строковое значение, удовлетворяющее условию', () => {
-    dto.conditional = 'okTest';
+  it("пропускает корректное строковое значение, удовлетворяющее условию", () => {
+    dto.conditional = "okTest";
     expect(() => validate(dto)).not.toThrow();
   });
 
-  it('бросает ValidationError, если строка не проходит основной валидатор', () => {
-    dto.conditional = 'nope';
+  it("бросает ValidationError, если строка не проходит основной валидатор", () => {
+    dto.conditional = "nope";
     expect(() => validate(dto)).toThrow(ValidationError);
     expect(() => validate(dto)).toThrow(/^conditional: условие не выполнено/);
   });
+});
+
+describe("Числовые и enum-декораторы", () => {
+  enum Role {
+    ADMIN = "admin",
+    USER = "user",
+  }
+
+  class NumEnumDto {
+    @IsInt() cnt!: number;
+    @IsPositive() pos!: number;
+    @IsNegative() neg!: number;
+    @IsEnum(Role) role!: Role;
+  }
+
+  let dto: NumEnumDto;
+  beforeEach(() => {
+    dto = new NumEnumDto();
+  });
+
+  it("пропускает корректные значения", () => {
+    Object.assign(dto, { cnt: 0, pos: 5, neg: -3, role: Role.ADMIN });
+    expect(() => validate(dto)).not.toThrow();
+  });
+
+  it("бросает для некорректного целого", () => {
+    dto.cnt = 1.5 as any;
+    expect(() => validate(dto)).toThrow(/^cnt: ожидается целое число/);
+  });
+
+  it("бросает для не положительного", () => {
+    Object.assign(dto, { cnt: 1 });
+    dto.pos = 0;
+    expect(() => validate(dto)).toThrow(/^pos: ожидается положительное число/);
+  });
+
+  it("бросает для не отрицательного", () => {
+    Object.assign(dto, { cnt: 1, pos: 1 });
+    dto.neg = 1;
+    expect(() => validate(dto)).toThrow(/^neg: ожидается отрицательное число/);
+  });
+
+  it("бросает для неверного enum", () => {
+    Object.assign(dto, { cnt: 0, pos: 1, neg: -1 });
+    (dto.role as any) = "guest";
+    expect(() => validate(dto)).toThrow(
+      /^role: значение должно быть одним из: admin, user/
+    );
+  });
+});
+
+describe("Matches декоратор", () => {
+  class Dto {
+    @Matches(/^\d{4}$/, "должно быть 4 цифры") code!: string;
+  }
+  let dto: Dto;
+  beforeEach(() => {
+    dto = new Dto();
+  });
+  it("Matches: правильный формат", () => {
+    dto.code = "1234";
+    expect(() => {
+      validate(dto);
+    }).not.toThrow();
+  });
+  it("Matches: неправильный формат", () => {
+    dto.code = "12ab";
+    expect(() => validate(dto)).toThrow(/code: должно быть 4 цифры/);
+  });
+});
+
+describe("MinItems/@MaxItems декораторы", () => {
+  class Dto {
+    @MinItems(2) @MaxItems(4) arr!: any[];
+  }
+  let dto: Dto;
+  beforeEach(() => {
+    dto = new Dto();
+  });
+
+  it("MinItems: достаточно", () => {
+    dto.arr = [1, 2];
+    expect(() => validate(dto)).not.toThrow();
+  });
+  it("MinItems: недостаточно", () =>
+    expect(() => {
+      dto.arr = [1];
+      validate(dto);
+    }).toThrow(/arr: ожидается минимум 2 элементов/));
+
+  it("MaxItems: достаточно", () => {
+    dto.arr = [1, 2, 3, 4];
+    expect(() => validate(dto)).not.toThrow();
+  });
+  it("MaxItems: недостаточно", () =>
+    expect(() => {
+      dto.arr = [1, 2, 3, 4, 5];
+      validate(dto);
+    }).toThrow(/arr: ожидается не более 4 элементов/));
 });
