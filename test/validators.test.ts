@@ -19,7 +19,10 @@ import {
   isIn,
   isNotEmpty,
   isUpperCase,
-  isLowerCase,
+  isLowerCase,isInt,
+  isPositive,
+  isNegative,
+  isEnum,
   ValidationError,
 } from '../src/validators';
 
@@ -180,5 +183,41 @@ describe('Параметризованные валидаторы', () => {
   it('isLowerCase: не все в нижнем', () => {
     const fn = isLowerCase();
     expect(() => fn('aBc', 'l')).toThrow(/l:/);
+  });
+});
+
+describe('Дополнительные числовые валидаторы', () => {
+  it('isInt: положительный сценарий', () => {
+    expect(isInt(5, 'n')).toBe(5);
+  });
+  it('isInt: дробное число', () => {
+    expect(() => isInt(3.2, 'n')).toThrow(ValidationError);
+    expect(() => isInt(3.2, 'n')).toThrow(/n: ожидается целое число/);
+  });
+  it('isPositive: положительное число', () => {
+    expect(isPositive(1, 'p')).toBe(1);
+  });
+  it('isPositive: ноль или отрицательное', () => {
+    expect(() => isPositive(0, 'p')).toThrow(/p: ожидается положительное число/);
+  });
+  it('isNegative: отрицательное число', () => {
+    expect(isNegative(-1, 'm')).toBe(-1);
+  });
+  it('isNegative: ноль или положительное', () => {
+    expect(() => isNegative(0, 'm')).toThrow(/m: ожидается отрицательное число/);
+  });
+});
+
+describe('Валидатор enum/isEnum', () => {
+  const Colors = { RED: 'RED', GREEN: 'GREEN', BLUE: 'BLUE' } as const;
+  const fn = isEnum(Colors);
+  it('корректное значение', () => {
+    expect(fn('GREEN', 'c')).toBe('GREEN');
+  });
+  it('некорректное значение', () => {
+    expect(() => fn('YELLOW', 'c')).toThrow(ValidationError);
+    expect(() => fn('YELLOW', 'c')).toThrow(
+      /c: значение должно быть одним из: RED, GREEN, BLUE/
+    );
   });
 });

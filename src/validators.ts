@@ -48,7 +48,6 @@ export function isBoolean(value: unknown, path = "value"): boolean {
   return value;
 }
 
-
 /**
  * Проверяет, что значение является массивом.
  * @throws ValidationError если значение не массив.
@@ -124,7 +123,6 @@ export function isUrl(value: unknown, path = "value"): string {
   return value;
 }
 
-
 /**
  * Проверяет, что значение является строкой в формате UUID.
  * @throws ValidationError если значение не строка или не UUID.
@@ -133,7 +131,8 @@ export function isUUID(value: unknown, path = "value"): string {
   if (typeof value !== "string") {
     throw new ValidationError(path, "ожидается строка");
   }
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(value)) {
     throw new ValidationError(path, "неверный формат UUID");
   }
@@ -192,15 +191,15 @@ export function minValidator(min: number) {
  * @throws ValidationError если число больше max.
  */
 export function maxValidator(max: number) {
-    return function(value: unknown, path = "value"): number {
-        if (typeof value !== "number" || Number.isNaN(value)) {
-            throw new ValidationError(path, "ожидается число");
-        }
-        if (value > max) {
-            throw new ValidationError(path, `значение должно быть меньше ${max}`);
-        }
-        return value;
+  return function (value: unknown, path = "value"): number {
+    if (typeof value !== "number" || Number.isNaN(value)) {
+      throw new ValidationError(path, "ожидается число");
     }
+    if (value > max) {
+      throw new ValidationError(path, `значение должно быть меньше ${max}`);
+    }
+    return value;
+  };
 }
 
 /**
@@ -223,7 +222,10 @@ export function validateIfValidator(condition: (value: unknown) => boolean) {
 export function isIn(values: unknown[]) {
   return function (value: unknown, path = "value"): unknown {
     if (!values.includes(value)) {
-      throw new ValidationError(path, `значение должно быть одним из: ${values.join(", ")}`);
+      throw new ValidationError(
+        path,
+        `значение должно быть одним из: ${values.join(", ")}`
+      );
     }
     return value;
   };
@@ -234,15 +236,15 @@ export function isIn(values: unknown[]) {
  * @throws ValidationError если строка пустая.
  */
 export function isNotEmpty() {
-    return function (value: unknown, path = "value"): string {
-        if (typeof value !== "string") {
-        throw new ValidationError(path, "ожидается строка");
-        }
-        if (value.trim() === "") {
-        throw new ValidationError(path, "значение не должно быть пустым");
-        }
-        return value;
-    };
+  return function (value: unknown, path = "value"): string {
+    if (typeof value !== "string") {
+      throw new ValidationError(path, "ожидается строка");
+    }
+    if (value.trim() === "") {
+      throw new ValidationError(path, "значение не должно быть пустым");
+    }
+    return value;
+  };
 }
 
 /**
@@ -272,6 +274,62 @@ export function isLowerCase() {
     }
     if (value !== value.toLowerCase()) {
       throw new ValidationError(path, "строка должна быть в нижнем регистре");
+    }
+    return value;
+  };
+}
+
+/**
+ * Проверяет, что значение — целое число.
+ * @throws ValidationError если число не целое.
+ */
+export function isInt(value: unknown, path = "value"): number {
+  if (
+    typeof value !== "number" ||
+    Number.isNaN(value) ||
+    !Number.isInteger(value)
+  ) {
+    throw new ValidationError(path, "ожидается целое число");
+  }
+  return value;
+}
+
+/**
+ * Проверяет, что число > 0.
+ * @throws ValidationError если число не положительное.
+ */
+export function isPositive(value: unknown, path = "value"): number {
+  const num = isNumber(value, path);
+  if (num <= 0) {
+    throw new ValidationError(path, "ожидается положительное число");
+  }
+  return num;
+}
+
+/**
+ * Проверяет, что число < 0.
+ * @throws ValidationError если число не отрицательное.
+ */
+export function isNegative(value: unknown, path = "value"): number {
+  const num = isNumber(value, path);
+  if (num >= 0) {
+    throw new ValidationError(path, "ожидается отрицательное число");
+  }
+  return num;
+}
+
+/**
+ * Проверяет, что значение входит в переданный enum-объект.
+ * @throws ValidationError если значение не входит в переданный enum-объект.
+ */
+export function isEnum(enumObj: Record<string, unknown>) {
+  const values = Object.values(enumObj);
+  return function (value: unknown, path = "value"): unknown {
+    if (!values.includes(value)) {
+      throw new ValidationError(
+        path,
+        `значение должно быть одним из: ${values.join(", ")}`
+      );
     }
     return value;
   };
