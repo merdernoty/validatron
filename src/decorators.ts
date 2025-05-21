@@ -20,7 +20,10 @@ import {
   isUrl,
   isUUID,
   lengthValidator,
+  matchesRegex,
+  maxItems,
   maxValidator,
+  minItems,
   minValidator,
   validateIfValidator,
   ValidatorFn,
@@ -74,6 +77,10 @@ export const IsPositive = () => createPropertyDecorator(isPositive);
 export const IsNegative = () => createPropertyDecorator(isNegative);
 export const IsEnum = (enumObj: Record<string, unknown>) =>
   createPropertyDecorator(isEnum(enumObj));
+export const Matches = (regex: RegExp, message?: string) =>
+  createPropertyDecorator(matchesRegex(regex, message));
+export const MinItems = (min: number) => createPropertyDecorator(minItems(min));
+export const MaxItems = (max: number) => createPropertyDecorator(maxItems(max));
 
 export function validate(obj: any): void {
   const prototype = Object.getPrototypeOf(obj);

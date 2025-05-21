@@ -1,29 +1,32 @@
 import "reflect-metadata";
 import {
-  IsBoolean,
   IsArray,
-  IsObject,
+  IsBoolean,
   IsDate,
   IsEmail,
-  IsUrl,
-  IsUUID,
-  IsPhoneNumber,
-  Length,
-  Min,
-  Max,
-  ValidateIf,
+  IsEnum,
   IsIn,
+  IsInt,
+  IsLowerCase,
+  IsNegative,
   IsNotEmpty,
   IsNotNull,
-  IsUpperCase,
-  IsLowerCase,
-  validate,
-  ValidationError,
-  IsString,
-  IsInt,
+  IsObject,
+  IsPhoneNumber,
   IsPositive,
-  IsNegative,
-  IsEnum,
+  IsString,
+  IsUpperCase,
+  IsUrl,
+  IsUUID,
+  Length,
+  Matches,
+  Max,
+  MaxItems,
+  Min,
+  MinItems,
+  validate,
+  ValidateIf,
+  ValidationError,
 } from "../src";
 
 describe("Дополнительные декораторы", () => {
@@ -184,46 +187,101 @@ describe("ValidateIf декоратор в изоляции", () => {
   });
 });
 
-describe('Числовые и enum-декораторы', () => {
-  enum Role { ADMIN = 'admin', USER = 'user' }
+describe("Числовые и enum-декораторы", () => {
+  enum Role {
+    ADMIN = "admin",
+    USER = "user",
+  }
 
   class NumEnumDto {
-    @IsInt()      cnt!: number;
+    @IsInt() cnt!: number;
     @IsPositive() pos!: number;
     @IsNegative() neg!: number;
     @IsEnum(Role) role!: Role;
   }
 
   let dto: NumEnumDto;
-  beforeEach(() => { dto = new NumEnumDto(); });
+  beforeEach(() => {
+    dto = new NumEnumDto();
+  });
 
-  it('пропускает корректные значения', () => {
+  it("пропускает корректные значения", () => {
     Object.assign(dto, { cnt: 0, pos: 5, neg: -3, role: Role.ADMIN });
     expect(() => validate(dto)).not.toThrow();
   });
 
-  it('бросает для некорректного целого', () => {
+  it("бросает для некорректного целого", () => {
     dto.cnt = 1.5 as any;
     expect(() => validate(dto)).toThrow(/^cnt: ожидается целое число/);
   });
 
-  it('бросает для не положительного', () => {
+  it("бросает для не положительного", () => {
     Object.assign(dto, { cnt: 1 });
     dto.pos = 0;
     expect(() => validate(dto)).toThrow(/^pos: ожидается положительное число/);
   });
 
-  it('бросает для не отрицательного', () => {
+  it("бросает для не отрицательного", () => {
     Object.assign(dto, { cnt: 1, pos: 1 });
     dto.neg = 1;
     expect(() => validate(dto)).toThrow(/^neg: ожидается отрицательное число/);
   });
 
-  it('бросает для неверного enum', () => {
+  it("бросает для неверного enum", () => {
     Object.assign(dto, { cnt: 0, pos: 1, neg: -1 });
-    (dto.role as any) = 'guest';
+    (dto.role as any) = "guest";
     expect(() => validate(dto)).toThrow(
       /^role: значение должно быть одним из: admin, user/
     );
   });
+});
+
+describe("Matches декоратор", () => {
+  class Dto {
+    @Matches(/^\d{4}$/, "должно быть 4 цифры") code!: string;
+  }
+  let dto: Dto;
+  beforeEach(() => {
+    dto = new Dto();
+  });
+  it("Matches: правильный формат", () => {
+    dto.code = "1234";
+    expect(() => {
+      validate(dto);
+    }).not.toThrow();
+  });
+  it("Matches: неправильный формат", () => {
+    dto.code = "12ab";
+    expect(() => validate(dto)).toThrow(/code: должно быть 4 цифры/);
+  });
+});
+
+describe("MinItems/@MaxItems декораторы", () => {
+  class Dto {
+    @MinItems(2) @MaxItems(4) arr!: any[];
+  }
+  let dto: Dto;
+  beforeEach(() => {
+    dto = new Dto();
+  });
+
+  it("MinItems: достаточно", () => {
+    dto.arr = [1, 2];
+    expect(() => validate(dto)).not.toThrow();
+  });
+  it("MinItems: недостаточно", () =>
+    expect(() => {
+      dto.arr = [1];
+      validate(dto);
+    }).toThrow(/arr: ожидается минимум 2 элементов/));
+
+  it("MaxItems: достаточно", () => {
+    dto.arr = [1, 2, 3, 4];
+    expect(() => validate(dto)).not.toThrow();
+  });
+  it("MaxItems: недостаточно", () =>
+    expect(() => {
+      dto.arr = [1, 2, 3, 4, 5];
+      validate(dto);
+    }).toThrow(/arr: ожидается максимум 4 элементов/));
 });

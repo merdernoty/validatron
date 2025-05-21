@@ -334,3 +334,50 @@ export function isEnum(enumObj: Record<string, unknown>) {
     return value;
   };
 }
+
+/**
+ * Проверяет, что строка соответствует регулярному выражению.
+ * @throws ValidationError если значение не соответствует регулярному выражению.
+ */
+export function matchesRegex(
+  regex: RegExp,
+  message = "не соответствует шаблону"
+): ValidatorFn {
+  return (value: unknown, path = "value") => {
+    if (typeof value !== "string") {
+      throw new ValidationError(path, "ожидается строка");
+    }
+    if (!regex.test(value)) {
+      throw new ValidationError(path, message);
+    }
+    return value;
+  };
+}
+
+/**
+ * Проверяет, что массив имеет длину >= min.
+ * @throws ValidationError если массив не имеет длину >= min.
+ */
+export function minItems(min: number): ValidatorFn {
+  return (value: unknown, path = "value") => {
+    const arr = isArray<any>(value, path);
+    if (arr.length < min) {
+      throw new ValidationError(path, `ожидается минимум ${min} элементов`);
+    }
+    return arr;
+  };
+}
+
+/**
+ * Проверяет, что массив имеет длину <= max.
+ * @throws ValidationError если массив не имеет длину <= max.
+ */
+export function maxItems(max: number): ValidatorFn {
+  return (value: unknown, path = "value") => {
+    const arr = isArray<any>(value, path);
+    if (arr.length > max) {
+      throw new ValidationError(path, `ожидается не более ${max} элементов`);
+    }
+    return arr;
+  };
+}
